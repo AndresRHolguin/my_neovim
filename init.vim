@@ -4,7 +4,7 @@ set ssop-=folds      "do not store folds
 
 "Command below to obtain the packages from my custom home folder
 "set packpath=~/.vim
-set packpath=C:/Users/aholguin-ext/Downloads/Essentials/myplugins
+"set packpath=C:/Users/aholguin-ext/Downloads/Essentials/myplugins
 
 "Allow Shift+Insert key combination to work in neovim
 inoremap <silent> <S-Insert> <C-R>+
