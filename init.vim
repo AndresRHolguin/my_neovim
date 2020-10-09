@@ -7,6 +7,9 @@ set ssop-=folds      "do not store folds
 "set packpath=C:/Users/aholguin-ext/Downloads/Essentials/myplugins
 set packpath=$MYPACKPATH
 
+"Add custom abbreviation for documents path in each computer with windows
+cmap @@ C:\Users\holguina\Documents\
+
 "Allow Shift+Insert key combination to work in neovim
 inoremap <silent> <S-Insert> <C-R>+
 cnoremap <silent> <S-Insert> <C-R>+
@@ -48,7 +51,8 @@ set hlsearch
 set ruler
 
 "Use custom color in plugins folder
-colorscheme snow
+"colorscheme snow
+colorscheme PaperColor
 set termguicolors
 
 "Change font
@@ -144,16 +148,16 @@ iabbrev sql sql;<cr>create table changethis as<cr>select *<cr>from changethis<cr
 "****************************************
 "Command to change fileencoding as utf-8 causes issues with specialcharacters
 "in SAS 
-augroup encoding_sas
-   autocmd!
-   "autocmd BufWrite *.sas :set fileencoding=latin1
-   autocmd BufWrite *.sas :set fileencoding=utf-8
-augroup END
+"augroup encoding_sas
+   "autocmd!
+   ""autocmd BufWrite *.sas :set fileencoding=latin1
+   "autocmd BufWrite *.sas :set fileencoding=utf-8
+"augroup END
 
 cabbrev z: \\192.168.155.33\sasdata\
 
 "Add here temporary abbreviations for work
-cnoremap @@ C:\Users\aholguin-ext\Documents\
+"cnoremap @@ C:\Users\aholguin-ext\Documents\
 "cabbrev dsur z:\_STAT\PEANUT\META\PROG\06_Analysis\DSUR2020
 "cabbrev eu z:\_STAT\PEANUT\META\PROG\06_Analysis\EU
 "cabbrev realise z:\_STAT\PEANUT\REALISE
@@ -175,3 +179,12 @@ cabbrev d; D:\Calypse_projet_etoile
 "nnoremap <leader>eu :g/}/norm \aa<cr>
 nnoremap <leader>aa o#Data discrepancies creationlibrary("dplyr")q_changeme <- changeme %>% filter() %>% mutate(query = "text")report_changeme <- q_changemesave(report_changeme, "report_changeme.rda")
 nnoremap <leader>eu :g/save(/norm \aa<cr>/changeme<cr>
+
+"ICON/DOCS mappings
+"****************************************
+iabbrev tda2 DE#TDA2
+iabbrev admin IADM
+iabbrev train IBILL
+iabbrev jtrain JBILL
+iabbrev jadmin JADM
+
