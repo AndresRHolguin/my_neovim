@@ -126,6 +126,8 @@ set laststatus=2
 nnoremap <leader>a ^
 nnoremap <leader>o g_
 nnoremap <leader>g G
+"remap to use in help page
+nnoremap g] <C-]> 
 
 "Remap to put the date at the end of the line
 nnoremap <leader>id A<C-R>=strftime('%d%b%Y')<CR><ESC>

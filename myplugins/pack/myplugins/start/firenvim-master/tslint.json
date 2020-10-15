@@ -1,0 +1,23 @@
+{
+  "extends": ["tslint:recommended"],
+  "rules": {
+    "arrow-parens": false,
+    "cognitive-complexity": false,
+    "comment-format": false,
+    "max-line-length": [
+      true,
+      {
+        "ignore-pattern": "http",
+        "limit": 120
+      }
+    ],
+    "max-union-size": false,
+    "no-big-function": false,
+    "no-conditional-assignment": false,
+    "no-console": false,
+    "no-namespace": false,
+    "no-switch-case-fall-through": true,
+    "no-useless-cast": false,
+    "semicolon": [true, "always"]
+  }
+}
