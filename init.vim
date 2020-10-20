@@ -8,7 +8,7 @@ set ssop-=folds      "do not store folds
 set packpath=$MYPACKPATH
 
 "Add custom abbreviation for documents path in each computer with windows
-cmap @@ C:\Users\holguina\Documents\
+"cmap @@ C:\Users\holguina\Documents\
 
 "Allow Shift+Insert key combination to work in neovim
 inoremap <silent> <S-Insert> <C-R>+
@@ -50,10 +50,13 @@ set hlsearch
 "Add position information at screen's bottom right
 set ruler
 
+"Always activate before colorscheme
+set termguicolors
+
 "Use custom color in plugins folder
 "colorscheme snow
-colorscheme PaperColor
-set termguicolors
+"colorscheme PaperColor
+colorscheme iceberg
 
 "Change font
 "set guifont=Consolas:h12
@@ -172,7 +175,7 @@ cabbrev pepites \\192.168.155.33\sasdata\_STAT\PEANUT\PEPITES
 cabbrev epitope \\192.168.155.33\sasdata\_STAT\PEANUT\EPITOPE
 
 "Temporary remapings for projects
-nnoremap \ee :source \Users\aholguin-ext\Documents\temp\script_EU_204.vim
+nnoremap \ee :source \Users\aholguin-ext\Documents\temp\script_EU_204.vim
 
 "Calypse Consulting
 "****************************************
