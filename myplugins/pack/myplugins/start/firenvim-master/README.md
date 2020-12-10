@@ -1,6 +1,6 @@
 # Firenvim  [![Build & Test](https://github.com/glacambre/firenvim/workflows/Test/badge.svg)](https://github.com/glacambre/firenvim/actions?workflow=Test) [![Total alerts](https://img.shields.io/lgtm/alerts/g/glacambre/firenvim.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/glacambre/firenvim/alerts/) [![Vint](https://github.com/glacambre/firenvim/workflows/Vint/badge.svg)](https://github.com/glacambre/firenvim/actions?workflow=Vint) [![Luacheck](https://github.com/glacambre/firenvim/workflows/Luacheck/badge.svg)](https://github.com/glacambre/firenvim/actions?workflow=Luacheck) [![Matrix](https://img.shields.io/matrix/firenvim:matrix.org)](https://riot.im/app/#/room/#firenvim:matrix.org) [![Wiki](https://img.shields.io/badge/wiki-open-brightgreen)](https://github.com/glacambre/firenvim/wiki)
 
-Turn your browser¹ into a Neovim client.
+Turn your browser¹ into a Neovim client (demos: [justinmk 🇺🇸](https://www.youtube.com/watch?v=suvh0yFfIB8), [ThePrimeagen 🇺🇸](https://www.youtube.com/watch?v=ID_kNcj9cMo), [Sean Feng 🇨🇳](https://www.youtube.com/watch?v=dNQJONKnJrg)).
 
 ¹ <sub>Firefox and Chrome are specifically supported. Other Chromium based browsers such as Brave, Vivaldi, and Opera should also work but are not specifically tested.</sub>
 
@@ -227,12 +227,31 @@ Terminal and standalone GUI applications can solve these problems by changing th
 
 For problem (1), Firenvim will by default drop the alt key on MacOS for any special character, defined here as non-alphanumeric (not matching `/[a-zA-Z0-9]/`). This means alt-o will be forwarded to NeoVim as "ø" rather than "M-ø". Note that this behavior can be changed by setting the `alt` setting of the `globalSettings` configuration to `all`, like this:
 
-### Interacting with the page
+### Making Firenvim ignore keys
 
-You can execute javascript in the page by using `firenvim#eval_js`. Here's an example that creates a `:GithubComment` command that will click on the `Comment` button of Github issues:
+You can make Firenvim ignore key presses (thus letting the browser handle them) by setting key-value pairs in `globalSettings.ignoreKeys`. The key needs to be the neovim mode the key press should be ignored in and the value should be an array containing the textual representation of the key press you want ignored. If you want to ignore a key press in all modes, you can use `all` as mode key.
+
+For example, if you want to make Firenvim ignore `<C-1>` and `<C-2>` in normal mode and `<C-->` in all modes to let your browser handle them, you should define ignoreKeys like this:
 
 ```vim
-command GithubComment call firenvim#eval_js('document.getElementById("partial-new-comment-form-actions").getElementsByClassName("btn btn-primary")[0].click()')
+let g:firenvim_config = {
+    \ 'globalSettings': {
+        \ 'ignoreKeys': {
+            \ 'all': ['<C-->'],
+            \ 'normal': ['<C-1>', '<C-2>']
+        \ }
+    \ }
+\ }
+```
+
+Mode names are defined in [Neovim's cursor_shape.c](https://github.com/neovim/neovim/blob/master/src/nvim/cursor_shape.c). Note that if the key press contains multiple modifiers, Shift needs to be first, Alt second, Control third and OS/Meta last (e.g. `Ctrl+Alt+Shift+1` needs to be `<SAC-1>`). If your keyboard layout requires you to press shift in order to press numbers, shift should be present in the key representation (e.g. on french azerty keyboards, `<C-1>` should actually be `<SC-1>`).
+
+### Interacting with the page
+
+You can execute javascript in the page by using `firenvim#eval_js`. The code has to be a valid javascript expression (NOT a statement). You can provide the name of a function that should be executed with the result of the expression. Note that some pages prevent evaluating JavaScript with their [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) and this can't be worked around. Here's an example:
+
+```vim
+call firenvim#eval_js('alert("Hello World!")', 'MyFunction')
 ```
 
 You can move focus from the editor back to the page or the input field by calling `firenvim#focus_page` or `firenvim#focus_input`. Here's an example that does exactly this if you press `<Esc>` twice while in normal mode:

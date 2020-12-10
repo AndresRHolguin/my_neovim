@@ -16,8 +16,9 @@ function! firenvim#get_chan() abort
         return uis[0].chan
 endfunction
 
-function! firenvim#eval_js(js) abort
-        call rpcnotify(firenvim#get_chan(), 'firenvim_eval_js', a:js)
+function! firenvim#eval_js(js, ...) abort
+        let callback_name = get(a:, 1, '')
+        call rpcnotify(firenvim#get_chan(), 'firenvim_eval_js', a:js, callback_name)
 endfunction
 
 " Asks the browser extension to release focus from the frame and focus the
@@ -232,6 +233,15 @@ function! s:get_chrome_manifest_dir_path() abort
         return s:build_path([$HOME, '.config', 'google-chrome', 'NativeMessagingHosts'])
 endfunction
 
+function! s:get_brave_manifest_dir_path() abort
+        if has('mac')
+                return s:get_chrome_manifest_dir_path()
+        elseif has('win32')
+                return s:get_chrome_manifest_dir_path()
+        end
+        return s:build_path([$HOME, '.config', 'BraveSoftware', 'Brave-Browser', 'NativeMessagingHosts'])
+endfunction
+
 function! s:canary_config_exists() abort
         if has('mac')
                 let l:p = [$HOME, 'Library', 'Application Support', 'Google', 'Chrome Canary']
@@ -381,7 +391,7 @@ function! s:get_browser_configuration() abort
                 \'brave': {
                         \ 'has_config': s:brave_config_exists(),
                         \ 'manifest_content': function('s:get_chrome_manifest'),
-                        \ 'manifest_dir_path': function('s:get_chrome_manifest_dir_path'),
+                        \ 'manifest_dir_path': function('s:get_brave_manifest_dir_path'),
                         \ 'registry_key': 'HKCU:\Software\Google\Chrome\NativeMessagingHosts\firenvim',
                 \},
                 \'chrome': {

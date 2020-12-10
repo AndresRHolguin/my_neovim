@@ -11,8 +11,8 @@ set packpath=$MYPACKPATH
 "cmap @@ C:\Users\holguina\Documents\
 
 "Allow Shift+Insert key combination to work in neovim
-inoremap <silent> <S-Insert> <C-R>+
-cnoremap <silent> <S-Insert> <C-R>+
+"inoremap <silent> <S-Insert> <C-R>+
+"cnoremap <silent> <S-Insert> <C-R>+
 
 "Set leader as in gvim
 let mapleader = '\'
@@ -30,7 +30,8 @@ nnoremap ¡¡ :bp<CR>
 nnoremap çç :b#<CR>
 
 "Command to change the current directory for the current window
-nnoremap <leader>cd lcd %:h<CR>
+"nnoremap <leader>cd lcd %:h<CR>
+nnoremap <leader>cd :lcd %:h<CR>
 
 "Allow backspace to delete indents and previously entered lines
 set backspace=indent,eol,start
@@ -56,7 +57,9 @@ set termguicolors
 "Use custom color in plugins folder
 "colorscheme snow
 "colorscheme PaperColor
-colorscheme iceberg
+"colorscheme iceberg
+"colorscheme ayu
+colorscheme stellarized
 
 "Change font
 "set guifont=Consolas:h12
@@ -75,6 +78,9 @@ augroup END
 "Ignore case in searches and take case into account if cap is used in search
 set ignorecase
 set smartcase
+
+"Ignore case when opening files or directories
+set wildignorecase
 
 "Change tab to spaces to match indentation in external programs like SAS
 set tabstop=4
@@ -102,7 +108,7 @@ set wildmode=longest,list,full
 "let MRU_Max_Entries = 1000
 
 "Add a line to indicate the limit of 80 characters per column
-set colorcolumn=90
+"set colorcolumn=90
 
 "Mappings to open vimrc easily and source the changes without closing session
 nnoremap <leader>ev :vsplit $MYINITVI<cr>
@@ -131,6 +137,11 @@ nnoremap <leader>o g_
 nnoremap <leader>g G
 "remap to use in help page
 nnoremap g] <C-]> 
+
+"Add autocomplete symbols
+inoremap ( ()<Esc>i
+inoremap { {}<Esc>i
+inoremap [ []<Esc>i
 
 "Remap to put the date at the end of the line
 nnoremap <leader>id A<C-R>=strftime('%d%b%Y')<CR><ESC>
@@ -193,3 +204,18 @@ iabbrev train IBILL
 iabbrev jtrain JBILL
 iabbrev jadmin JADM
 
+"Abbreviation below is used to access Work Library on LSAF server in Fedora
+cabbrev lsafw  /run/user/1000/gvfs/dav:host=jajprod.ondemand.sas.com,ssl=true,prefix=\%2Flsaf\%2Fwebdav\%2Fwork
+"Abbreviation below is used to access Repo Library on LSAF server in Fedora
+cabbrev lsafr /run/user/1000/gvfs/dav:host=jajprod.ondemand.sas.com,ssl=true,prefix=\%2Flsaf\%2Fwebdav\%2Frepo
+
+"Steps below configure the textbox that appears in firefox
+if exists('g:started_by_firenvim') && g:started_by_firenvim
+    " general options
+    set laststatus=0 nonumber noruler noshowcmd
+
+    augroup firenvim
+        autocmd!
+        autocmd BufEnter *.txt setlocal filetype=markdown.pandoc
+    augroup END
+endif

@@ -387,7 +387,7 @@ export async function testEvalJs(driver: webdriver.WebDriver) {
         const ready = firenvimReady(driver);
         await driver.wait(Until.elementLocated(By.css("body > span:nth-child(2)")), 5000, "body > span:nth-child(2) not found");
         await ready;
-        await sendKeys(driver, `:call firenvim#eval_js('document`.split(""));
+        await sendKeys(driver, `:call firenvim#eval_js('(document`.split(""));
         // Using the <C-v> trick here because Chrome somehow replaces `.` with
         // `<`. This might have to do with locale stuff?
         await driver.actions()
@@ -403,7 +403,7 @@ export async function testEvalJs(driver: webdriver.WebDriver) {
                 .keyUp("v")
                 .keyUp(webdriver.Key.CONTROL)
                 .perform();
-        await sendKeys(driver, `046value = "Eval Works!"')`.split("")
+        await sendKeys(driver, `046value = "Eval Works!")')`.split("")
                 .concat(webdriver.Key.ENTER));
         await driver.wait(async () => (await input.getAttribute("value")) !== "", 5000, "Input value did not change");
         expect(await input.getAttribute("value")).toBe("Eval Works!");
@@ -735,6 +735,81 @@ export async function testWorksInFrame(driver: webdriver.WebDriver) {
         await driver.wait(Until.stalenessOf(span), 5000, "Firenvim span did not go stale.");
         await driver.wait(async () => (await input.getAttribute("value") !== ""), 5000, "Input value did not change");
         expect(await input.getAttribute("value")).toBe("a");
+}
+
+export async function testIgnoreKeys(driver: webdriver.WebDriver) {
+        const vimrcContent = await readVimrc();
+        await writeVimrc(`
+nnoremap <C-1> i<LT>C-1><Esc>
+nnoremap <C-2> i<LT>C-2><Esc>
+inoremap <C-1> <LT>C-1>
+inoremap <C-2> <LT>C-2>
+inoremap <C-3> <LT>C-3>
+inoremap <C-4> <LT>C-4>
+let g:firenvim_config = {
+        \\ 'globalSettings': {
+                \\ 'ignoreKeys': {
+                        \\ 'normal': ['<C-1>'],
+                        \\ 'insert': ['<C-2>', '<C-3>'],
+                \\ }
+        \\ }
+\\ }
+${vimrcContent}
+                `);
+        await reloadNeovim(driver);
+        await loadLocalPage(driver, "simple.html", "Key passthrough test");
+        const input = await driver.wait(Until.elementLocated(By.id("content-input")), 5000, "input not found");
+        await driver.executeScript("arguments[0].scrollIntoView(true);", input);
+        await driver.actions().click(input).perform();
+        const ready = firenvimReady(driver);
+        const span = await driver.wait(Until.elementLocated(By.css("body > span:nth-child(2)")), 5000, "Firenvim span not found");
+        await ready;
+        await driver.actions()
+                // normal <C-1>
+                .keyDown(webdriver.Key.CONTROL)
+                .keyDown("1")
+                .keyUp("1")
+                .keyUp(webdriver.Key.CONTROL)
+                // normal <C-2>
+                .keyDown(webdriver.Key.CONTROL)
+                .keyDown("2")
+                .keyUp("2")
+                .keyUp(webdriver.Key.CONTROL)
+                // enter insert mode
+                .keyDown("a")
+                .keyUp("a")
+                .pause(1000)
+                // insert <C-1>
+                .keyDown(webdriver.Key.CONTROL)
+                .keyDown("1")
+                .keyUp("1")
+                .keyUp(webdriver.Key.CONTROL)
+                // insert <C-2>
+                .keyDown(webdriver.Key.CONTROL)
+                .keyDown("2")
+                .keyUp("2")
+                .keyUp(webdriver.Key.CONTROL)
+                // insert <C-3>
+                .keyDown(webdriver.Key.CONTROL)
+                .keyDown("3")
+                .keyUp("3")
+                .keyUp(webdriver.Key.CONTROL)
+                // insert <C-4>
+                .keyDown(webdriver.Key.CONTROL)
+                .keyDown("4")
+                .keyUp("4")
+                .keyUp(webdriver.Key.CONTROL)
+                .perform();
+        await sendKeys(driver, [webdriver.Key.ESCAPE]
+                       .concat(":wq!".split(""))
+                       .concat(webdriver.Key.ENTER))
+        await driver.wait(Until.stalenessOf(span), 5000, "Firenvim span did not disappear");
+        await driver.wait(async () => (await input.getAttribute("value") !== ""), 5000, "Input value did not change");
+        const result = "<C-2><C-1><C-4>"
+        // The reason for the exclamation mark is that chromedriver sucks for
+        // working with non us-qwerty keyboard layouts.
+        expect([result, "!"])
+               .toContain((await input.getAttribute("value")).slice(0, result.length));
 }
 
 export async function killDriver(driver: webdriver.WebDriver) {
