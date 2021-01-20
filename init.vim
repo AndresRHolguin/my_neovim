@@ -15,7 +15,8 @@ set packpath=$MYPACKPATH
 "cnoremap <silent> <S-Insert> <C-R>+
 
 "Set leader as in gvim
-let mapleader = '\'
+"let mapleader = '\'
+let mapleader = ')'
 
 "Set history greater than default
 set history=500
@@ -92,6 +93,12 @@ cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
 
 "This line is added to grant compatibility with NERDComments plugin
 "filetype plugin on
+
+"Open new file views on the right
+set splitright
+
+"Modify path to be able to find files recursively based on partial names
+set path+=**
 
 "Indentation
 set autoindent
