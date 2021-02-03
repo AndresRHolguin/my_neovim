@@ -1,127 +1,126 @@
+"Neovim config file
+"
+"github: AndresRHolguin/myneovim
+"Version: Nvim 0.5+
+
+"set foldmethod=marker
+
 "Change options so loading a session takes current vimrc configuration
 set ssop-=options    "do not store global and local values in a session
 set ssop-=folds      "do not store folds
 
-"Command below to obtain the packages from my custom home folder
-"set packpath=~/.vim
-"set packpath=C:/Users/aholguin-ext/Downloads/Essentials/myplugins
-set packpath=$MYPACKPATH
+"Plugins {{{
+call plug#begin(stdpath('data') . '/plugged')
 
-"Add custom abbreviation for documents path in each computer with windows
-"cmap @@ C:\Users\holguina\Documents\
+"Adding a color theme
+Plug 'ayu-theme/ayu-vim'
+"Plugin to handle comments
+Plug 'preservim/nerdcommenter'
+"Plugin to edit csv files
+Plug 'chrisbra/csv.vim'
+"Plugin to change symbols around a phrase or word, e.g. change ' to " | Plugin to allow . to repeat mappings from custom plugins (Added to support vim-surround)
+Plug 'tpope/vim-surround' | Plug 'tpope/vim-repeat'
+"Plugin to connect neovim with web browser
+Plug 'glacambre/firenvim'
+"Add COC support to autocomplete and other functions
+"Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"Plugin to autocomplete text (let's see how it works)
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' } | Plug 'deoplete-plugins/deoplete-lsp'
+"Plugin to handle configure native lsp in neovim (Replaces coc)
+Plug 'neovim/nvim-lspconfig'
 
-"Allow Shift+Insert key combination to work in neovim
-"inoremap <silent> <S-Insert> <C-R>+
-"cnoremap <silent> <S-Insert> <C-R>+
+call plug#end()
+"Plugins }}}
 
-"Set leader as in gvim
-"let mapleader = '\'
-let mapleader = ')'
+"Plugins configuration {{{
+"COC: Added this line to change default refresh time
+"set updatetime=300
 
-"Set history greater than default
-set history=500
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+"inoremap <silent><expr> <TAB>
+      "\ pumvisible() ? "\<C-n>" :
+      "\ <SID>check_back_space() ? "\<TAB>" :
+      "\ coc#refresh()
+"inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
-"Set hidden to allow editing multiple buffers without saving each time you
-"move
-set hidden
+"function! s:check_back_space() abort
+  "let col = col('.') - 1
+  "return !col || getline('.')[col - 1]  =~# '\s'
+"endfunction
 
-"Enter new commands to work with multiple buffers
-nnoremap ¿¿ :bn<CR>
-nnoremap ¡¡ :bp<CR>
-nnoremap çç :b#<CR>
+"Deoplete
+" Use deoplete.
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#lsp#handler_enabled = 1
 
-"Command to change the current directory for the current window
-"nnoremap <leader>cd lcd %:h<CR>
-nnoremap <leader>cd :lcd %:h<CR>
+lua << EOF 
+require'lspconfig'.pyright.setup{}
+EOF 
 
-"Allow backspace to delete indents and previously entered lines
-set backspace=indent,eol,start
+"Firenvim {{{
 
-"Activate syntax color
-syntax on
+"Steps below configure the textbox that appears in firefox
+if exists('g:started_by_firenvim') && g:started_by_firenvim
+    " general options
+    set laststatus=0 nonumber noruler noshowcmd
 
-"Allow incremental search it gives a more practical highlight search
-set incsearch
+    augroup firenvim
+        autocmd!
+        autocmd BufEnter *.txt setlocal filetype=markdown.pandoc
+    augroup END
+endif
 
-"Set highlight on search
-set hlsearch
+"Firenvim }}}
 
-"Press Space to turn off highlighting and clear any message already displayed.
-:nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
+"Plugins configuration }}}
 
-"Add position information at screen's bottom right
-set ruler
+"General {{{
 
-"Always activate before colorscheme
-set termguicolors
-
-"Use custom color in plugins folder
-"colorscheme snow
-"colorscheme PaperColor
-"colorscheme iceberg
-"colorscheme ayu
-colorscheme stellarized
-
-"Change font
-"set guifont=Consolas:h12
-
+"nmap ) <Nop> "This command unmaps the ) key to be used as leader without moving the cursor when no further keys are commented, probably it is no necessary
+let mapleader = ')' "Set leader key to use with Ergodox EZ
+set history=500 "Set history greater than default
+set hidden "Set hidden to allow editing multiple buffers without saving each time you move
+set backspace=indent,eol,start "Allow backspace to delete indents and previously entered lines
+syntax on "Activate syntax color
+set cursorline "Highlight current cursor line
+set incsearch "Allow incremental search it gives a more practical highlight search
+set hlsearch "Set highlight on search
+set ruler "Add position information at screen's bottom right
+set termguicolors "True color support
+let ayucolor="dark"   " for dark version of theme ayu
+colorscheme ayu "Select colorscheme
+set ignorecase "Ignore case of the search
+set smartcase "If caps are used in search it will override ignorecase
+set wildignorecase "Ignore case when opening files or directories
+set splitright "Open new file views on the right
+"set indentexpr "Indentation method
+set smartindent "Indentation method
+set wildmenu "Change the way tab key works in path completions
+set wildmode=longest,list,full "first tab try to complete until partial match, second tab to open a list and third tab to cycle through the list
+set foldmethod=syntax "Use folding according to the type of file used
+set nofoldenable "Open the file in unfolded state, use zM to close all folds
+set timeoutlen=500 "This command gives time to type the mappings assigned to leader key without executing original key function first
+"Change tab to spaces to match indentation in external programs like SAS {{{
+set tabstop=4
+set shiftwidth=4
+set expandtab
+"Change tab to spaces to match indentation in external programs like SAS }}}
+"Configure ruler number {{{
 "Add relative numberlines
 set number
 set relativenumber
-
+"Modify path to be able to find files recursively based on partial names
+set path+=**
 "Modify number lines so relativenumber is only shown in normal mode
 augroup numbertoggle
 autocmd!
     autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
     autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
 augroup END
-
-"Ignore case in searches and take case into account if cap is used in search
-set ignorecase
-set smartcase
-
-"Ignore case when opening files or directories
-set wildignorecase
-
-"Change tab to spaces to match indentation in external programs like SAS
-set tabstop=4
-set shiftwidth=4
-set expandtab
-
-"Set %% to expand to folder of the current buffer in command mode (:)
-cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
-
-"This line is added to grant compatibility with NERDComments plugin
-"filetype plugin on
-
-"Open new file views on the right
-set splitright
-
-"Modify path to be able to find files recursively based on partial names
-set path+=**
-
-"Indentation
-set autoindent
-filetype indent on
-
-"Change the way tab key works for path folders to use the first tab to try
-"to complete until partial match, the second tab to open a list and the
-"third tab to cycle through the list
-set wildmenu
-set wildmode=longest,list,full
-
-"Add MRU options (plugin to save the latest edited files)
-"let MRU_file = '~/_vim_mru_files'
-"let MRU_Max_Entries = 1000
-
-"Add a line to indicate the limit of 80 characters per column
-"set colorcolumn=90
-
-"Mappings to open vimrc easily and source the changes without closing session
-nnoremap <leader>ev :vsplit $MYINITVI<cr>
-nnoremap <leader>sv :source $MYINITVI<cr>
-
-"Customize statusline
+"Configure ruler number }}}
+"Customize statusline {{{
 set statusline=
 set statusline+=%#PmenuSel#
 set statusline+=%#LineNr#
@@ -135,20 +134,39 @@ set statusline+=\[%{&fileformat}\]
 set statusline+=\ %p%%
 set statusline+=\ %l:%c
 set statusline+=\ 
-"Always show status line
-set laststatus=2
+set laststatus=2 "Always show status line
+"Customize statusline }}}
+"Change fold method to syntax when opening sas files
+"augroup sas_folds
+   "autocmd!
+   "autocmd BufRead *.sas :set foldmethod=syntax
+"augroup END
 
-"Other remaps
-nnoremap <leader>a ^
-nnoremap <leader>o g_
-nnoremap <leader>g G
+"General }}}
+
+"Remaps {{{
+
+"Press Space to turn off highlighting and clear any message already displayed.
+nnoremap <silent> <Space> :nohlsearch<Bar>:echo<CR>
+"Previous buffer
+nnoremap <silent> ¿¿ :bp<CR>
+"Next buffer
+nnoremap <silent> ¡¡ :bn<CR>
+"Go to first buffer
+nnoremap <silent> çç :b#<CR>
+"Command to change the current directory for the current buffer
+nnoremap <leader>cd :lcd %:h<CR>
 "remap to use in help page
-nnoremap g] <C-]> 
+nnoremap <silent> g] <C-]> 
+"Open vim.init in a new vertical window
+"nnoremap <leader>ev :vsplit $MYVIMRC<cr>
+nnoremap <leader>ev :e $MYVIMRC<cr>
+"Reload vim.init settings
+nnoremap <leader>sv :source $MYVIMRC<cr>
+"Remap to quickly change the foldmethod to marker
+nnoremap <leader>fm :set foldmethod=marker<cr>za
 
-"Add autocomplete symbols
-inoremap ( ()<Esc>i
-inoremap { {}<Esc>i
-inoremap [ []<Esc>i
+"SAS specific remaps {{{
 
 "Remap to put the date at the end of the line
 nnoremap <leader>id A<C-R>=strftime('%d%b%Y')<CR><ESC>
@@ -156,73 +174,33 @@ nnoremap <leader>ic A/*Andrés Holguín <C-R>=strftime('%d%b%Y')<esc>*/<ESC>
 "Remap to insert the date while typing
 inoremap <leader>id <C-R>=strftime('%d%b%Y')<CR> 
 
-"SAS specific remaps
-"****************************************
-
 "Enter a comment and allow to enter supplementary text
 inoremap <leader>sc /*Andrés Holguín <C-R>=strftime('%d%b%Y')<CR>*/<esc>bi
 nnoremap <leader>sc A /*Andrés Holguín <C-R>=strftime('%d%b%Y')<CR>*/<esc>bi
 
 "Enter a basic sql step
-inoremap <leader>sql proc sql;<cr>create table changethis as<cr>select *<cr>from changethis<cr>where changethis<cr>group by changethis<cr>order by changethis<cr>;<cr><esc>Iquit;<esc>{/changethis<cr>
+"inoremap <leader>sql proc sql;<cr>create table changethis as<cr>select *<cr>from changethis<cr>where changethis<cr>group by changethis<cr>order by changethis<cr>;<cr><esc>Iquit;<esc>{/changethis<cr>
 iabbrev sql sql;<cr>create table changethis as<cr>select *<cr>from changethis<cr>where changethis<cr>group by changethis<cr>order by changethis<cr>;<cr><esc>Iquit;<esc>{/changethis<cr>
 
-"DBV-Tech particular config
-"****************************************
-"Command to change fileencoding as utf-8 causes issues with specialcharacters
-"in SAS 
-"augroup encoding_sas
-   "autocmd!
-   ""autocmd BufWrite *.sas :set fileencoding=latin1
-   "autocmd BufWrite *.sas :set fileencoding=utf-8
-"augroup END
+"SAS specific remaps }}}
 
-cabbrev z: \\192.168.155.33\sasdata\
+"ICON/DOCS mappings {{{
 
-"Add here temporary abbreviations for work
-"cnoremap @@ C:\Users\aholguin-ext\Documents\
-"cabbrev dsur z:\_STAT\PEANUT\META\PROG\06_Analysis\DSUR2020
-"cabbrev eu z:\_STAT\PEANUT\META\PROG\06_Analysis\EU
-"cabbrev realise z:\_STAT\PEANUT\REALISE
-"cabbrev pepites z:\_STAT\PEANUT\PEPITES
-"cabbrev epitope z:\_STAT\PEANUT\EPITOPE
-cabbrev dsur \\192.168.155.33\sasdata\_STAT\PEANUT\META\PROG\06_Analysis\DSUR2020
-cabbrev eu \\192.168.155.33\sasdata\_STAT\PEANUT\META\PROG\06_Analysis\EU
-cabbrev realise \\192.168.155.33\sasdata\_STAT\PEANUT\REALISE
-cabbrev pepites \\192.168.155.33\sasdata\_STAT\PEANUT\PEPITES
-cabbrev epitope \\192.168.155.33\sasdata\_STAT\PEANUT\EPITOPE
-
-"Temporary remapings for projects
-nnoremap \ee :source \Users\aholguin-ext\Documents\temp\script_EU_204.vim
-
-"Calypse Consulting
-"****************************************
-cabbrev d; D:\Calypse_projet_etoile
-"nnoremap <leader>aa A else {<esc>oload("changethisnonsense.rda")<esc>o}<esc>/changethisnonsense<cr>:s//
-"nnoremap <leader>eu :g/}/norm \aa<cr>
-nnoremap <leader>aa o#Data discrepancies creationlibrary("dplyr")q_changeme <- changeme %>% filter() %>% mutate(query = "text")report_changeme <- q_changemesave(report_changeme, "report_changeme.rda")
-nnoremap <leader>eu :g/save(/norm \aa<cr>/changeme<cr>
-
-"ICON/DOCS mappings
-"****************************************
 iabbrev tda2 DE#TDA2
 iabbrev admin IADM
 iabbrev train IBILL
 iabbrev jtrain JBILL
 iabbrev jadmin JADM
 
+"ICON/DOCS mappings }}}
+
+"LSAF Janssen {{{
+
 "Abbreviation below is used to access Work Library on LSAF server in Fedora
 cabbrev lsafw  /run/user/1000/gvfs/dav:host=jajprod.ondemand.sas.com,ssl=true,prefix=\%2Flsaf\%2Fwebdav\%2Fwork
 "Abbreviation below is used to access Repo Library on LSAF server in Fedora
 cabbrev lsafr /run/user/1000/gvfs/dav:host=jajprod.ondemand.sas.com,ssl=true,prefix=\%2Flsaf\%2Fwebdav\%2Frepo
 
-"Steps below configure the textbox that appears in firefox
-if exists('g:started_by_firenvim') && g:started_by_firenvim
-    " general options
-    set laststatus=0 nonumber noruler noshowcmd
+"LSAF Janssen }}}
 
-    augroup firenvim
-        autocmd!
-        autocmd BufEnter *.txt setlocal filetype=markdown.pandoc
-    augroup END
-endif
+"Remaps }}}
